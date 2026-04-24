@@ -1,37 +1,22 @@
 # CodeGrade step0
 # Run this cell without changes
-
 # SQL Library and Pandas Library
 import sqlite3
 import pandas as pd
-
 # Connect to the database
 conn = sqlite3.connect('data.sqlite')
-
 pd.read_sql("""SELECT * FROM sqlite_master""", conn)
-
 # CodeGrade step1
 # Replace None with your code
 df_boston = pd.read_sql("""
-    SELECT e.firstName, e.lastName, e.jobTitle
-    FROM employees e
-    JOIN offices o ON e.officeCode = o.officeCode
-    WHERE o.city = 'Boston'
+SELECT firstName, lastName
+FROM employees
+JOIN offices ON employees.officeCode = offices.officeCode
+WHERE city = 'Boston'
 """, conn)
 df_boston
 
-# CodeGrade step0
-# Run this cell without changes
-
-# SQL Library and Pandas Library
-import sqlite3
-import pandas as pd
-
-# Connect to the database
-conn = sqlite3.connect('data.sqlite')
-
-pd.read_sql("""SELECT * FROM sqlite_master""", conn)
-
+ 
 # CodeGrade step2
 # Replace None with your code
 df_zero_emp = pd.read_sql("""
