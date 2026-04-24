@@ -52,7 +52,7 @@ df_employee
 
 # CodeGrade step4
 # Replace None with your code
-df_product_sold= pd.read_sql("""
+df_contacts= pd.read_sql("""
 SELECT 
 customers.contactfirstName,
 customers.contactLastName,
@@ -64,7 +64,18 @@ WHERE customers.customerNumber NOT IN (
 ORDER BY customers.contactLastName ASC
 
 """, conn)
+df_contacts
+df_product_sold = pd.read_sql("""
+SELECT 
+   products.productName,
+   orderdetails.quantityOrdered,
+   orderdetails.priceEach
+FROM products
+JOIN orderdetails ON orderdetails.productCode = products.productCode
+
+""", conn)
 df_product_sold
+
 
 # CodeGrade step5
 # Replace None with your code
@@ -94,7 +105,7 @@ SELECT
     JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
     GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
     HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY AVG(CAST(customers.creditLimit AS FLOAT)) DESC
+    ORDER BY employees.employeeNumber ASC
 """,conn)
 df_credit
 
