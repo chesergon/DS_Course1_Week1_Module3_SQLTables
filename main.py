@@ -53,7 +53,7 @@ df_employee
 # CodeGrade step4
 # Replace None with your code
 df_contacts= pd.read_sql("""
-SELECT 
+SELECT DISTINCT
 customers.contactfirstName,
 customers.contactLastName,
 customers.phone,
@@ -67,8 +67,8 @@ df_contacts
 df_product_sold = pd.read_sql("""
 SELECT 
    products.productName,
-   orderdetails.quantityOrdered,
-   orderdetails.priceEach
+   products.productCode,
+   SUM(orderdetails.quantityOrdered) AS totalunits
 FROM products
 JOIN orderdetails ON orderdetails.productCode = products.productCode
 GROUP BY products.productCode, products.productName
@@ -118,7 +118,7 @@ SELECT
     JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
     GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
     HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY employees.lastName ASC
+    ORDER BY number_of_customers ASC
 """,conn)
 df_credit
 
@@ -134,7 +134,7 @@ SELECT
     JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
     GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
     HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY number_of_customers DESC
+    ORDER BY number_of_customers ASC 
 """,conn)
 df_credit
 
