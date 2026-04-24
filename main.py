@@ -59,10 +59,9 @@ customers.contactLastName,
 customers.phone,
 customers.salesRepEmployeeNumber
 FROM customers
-WHERE customers.customerNumber NOT IN (
-     SELECT DISTINCT customerNumber FROM orders)
+LEFT JOIN orders ON orders.customerNumber = customers.customerNumber
+WHERE orders.customerNumber IS NULL
 ORDER BY customers.contactLastName ASC
-
 """, conn)
 df_contacts
 df_product_sold = pd.read_sql("""
@@ -72,7 +71,7 @@ SELECT
    orderdetails.priceEach
 FROM products
 JOIN orderdetails ON orderdetails.productCode = products.productCode
-
+GROUP BY products.productCode, products.productName
 """, conn)
 df_product_sold
 
@@ -92,6 +91,20 @@ ORDER BY CAST( payments.amount AS FLOAT)DESC
 
 """,conn)
 df_payment
+df_contacts = pd.read_sql("""
+SELECT 
+    customers.contactFirstName,
+    customers.contactLastName,
+    customers.phone,
+    customers.salesRepEmployeeNumber
+FROM customers
+WHERE customers.customerNumber NOT IN (
+ SELECT DISTINCT customerNumber FROM orders)
+ORDER BY customers.contactLastName ASC
+
+""", conn)
+df_contacts
+
 
 # CodeGrade step6
 # Replace None with your code
@@ -105,7 +118,7 @@ SELECT
     JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
     GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
     HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY employees.employeeNumber ASC
+    ORDER BY employees.lastName ASC
 """,conn)
 df_credit
 
