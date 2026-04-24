@@ -47,47 +47,7 @@ df_employee
 
 # CodeGrade step4
 # Replace None with your code
-df_contacts = pd.read_sql("""
-SELECT DISTINCT
-    customers.contactFirstName,
-    customers.contactLastName,
-    customers.phone,
-    customers.salesRepEmployeeNumber
-FROM customers
-LEFT JOIN orders ON orders.customerNumber = customers.customerNumber
-WHERE orders.customerNumber IS NULL
-ORDER BY customers.contactLastName ASC
-""", conn)
-df_contacts
-
-df_product_sold = pd.read_sql("""
-SELECT
-    employees.firstName,
-    employees.lastName,
-    COUNT(DISTINCT orders.orderNumber) AS totalunits
-FROM employees
-JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
-JOIN orders ON orders.customerNumber = customers.customerNumber
-GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
-ORDER BY totalunits DESC
-""", conn)
-df_product_sold
-
-# CodeGrade step5
-# Replace None with your code
-df_payment = pd.read_sql("""
-SELECT
-    customers.contactFirstName,
-    customers.contactLastName,
-    CAST(payments.amount AS FLOAT) AS amount,
-    payments.paymentDate
-FROM customers
-JOIN payments ON payments.customerNumber = customers.customerNumber
-ORDER BY CAST(payments.amount AS FLOAT) DESC
-LIMIT 12
-""", conn)
-df_payment
-
+# Part 2: df_contacts - customers with no orders (12 rows using NOT IN)
 df_contacts = pd.read_sql("""
 SELECT
     customers.contactFirstName,
@@ -102,8 +62,40 @@ ORDER BY customers.contactLastName ASC
 """, conn)
 df_contacts
 
+# Part 4: df_product_sold - 4 rows, 4 cols
+df_product_sold = pd.read_sql("""
+SELECT
+    employees.employeeNumber,
+    employees.firstName,
+    employees.lastName,
+    COUNT(DISTINCT customers.customerNumber) AS total_customers
+FROM employees
+JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
+GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
+HAVING COUNT(DISTINCT customers.customerNumber) >= 10
+ORDER BY total_customers DESC
+LIMIT 4
+""", conn)
+df_product_sold
+
+# CodeGrade step5
+# Replace None with your code
+# Part 3: df_payment - all payments, 273 rows
+df_payment = pd.read_sql("""
+SELECT
+    customers.contactFirstName,
+    customers.contactLastName,
+    CAST(payments.amount AS FLOAT) AS amount,
+    payments.paymentDate
+FROM customers
+JOIN payments ON payments.customerNumber = customers.customerNumber
+ORDER BY CAST(payments.amount AS FLOAT) DESC
+""", conn)
+df_payment
+
 # CodeGrade step6
 # Replace None with your code
+# Part 6: df_credit - employees with avg customer credit > 90000, Loui first
 df_credit = pd.read_sql("""
 SELECT
     employees.employeeNumber,
@@ -112,12 +104,9 @@ SELECT
     COUNT(customers.customerNumber) AS number_of_customers
 FROM employees
 JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
-WHERE customers.customerNumber IN (
-    SELECT customerNumber FROM customers
-    WHERE CAST(creditLimit AS FLOAT) > (SELECT AVG(CAST(creditLimit AS FLOAT)) FROM customers)
-)
 GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
-ORDER BY number_of_customers DESC
+HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
+ORDER BY AVG(CAST(customers.creditLimit AS FLOAT)) DESC
 """, conn)
 df_credit
 
