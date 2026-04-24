@@ -110,6 +110,9 @@ ORDER BY customers.contactLastName ASC
 df_contacts
 
 
+
+
+
 # CodeGrade step6
 # Replace None with your code
 SELECT 
@@ -127,8 +130,6 @@ GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
 ORDER BY number_of_customers DESC
 """, conn)
 df_credit
-
-
 
 
 # CodeGrade step8
