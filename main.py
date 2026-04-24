@@ -13,7 +13,7 @@ pd.read_sql("""SELECT * FROM sqlite_master""", conn)
 # CodeGrade step1
 # Replace None with your code
 df_boston = pd.read_sql(""" 
-SELECT firstName,lastName, jobTitle
+SELECT firstName,lastName
 FROM employees
  JOIN offices ON employees.officeCode = offices.officeCode
   WHERE city  ='Boston'
@@ -52,18 +52,19 @@ df_employee
 
 # CodeGrade step4
 # Replace None with your code
-df_contacts = pd.read_sql("""
+df_product_sold= pd.read_sql("""
 SELECT 
 customers.contactfirstName,
 customers.contactLastName,
 customers.phone,
 customers.salesRepEmployeeNumber
 FROM customers
-LEFT JOIN orders ON orders.customerNumber = customers.customerNumber
-WHERE orders.customerNumber IS NULL
+WHERE customers.customerNumber NOT IN (
+     SELECT DISTINCT customerNumber FROM orders)
 ORDER BY customers.contactLastName ASC
-""",conn)
-df_contacts
+
+""", conn)
+df_product_sold
 
 # CodeGrade step5
 # Replace None with your code
@@ -93,7 +94,7 @@ SELECT
     JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
     GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
     HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY number_of_customers DESC
+    ORDER BY AVG(CAST(customers.creditLimit AS FLOAT)) DESC
 """,conn)
 df_credit
 
