@@ -66,14 +66,18 @@ ORDER BY customers.contactLastName ASC
 df_contacts
 df_product_sold = pd.read_sql("""
 SELECT 
-   products.productName,
-   products.productCode,
-   SUM(orderdetails.quantityOrdered) AS totalunits
-FROM products
-JOIN orderdetails ON orderdetails.productCode = products.productCode
-GROUP BY products.productCode, products.productName
+  employees.firstName,
+    employees.lastName,
+    COUNT(DISTINCT orders.orderNumber) AS totalunits
+FROM employees
+JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
+JOIN orders ON orders.customerNumber = customers.customerNumber
+GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
+ORDER BY totalunits DESC
 """, conn)
 df_product_sold
+
+
 
 
 # CodeGrade step5
@@ -87,7 +91,7 @@ SELECT
 FROM customers
 JOIN payments ON  payments.customerNumber = customers.customerNumber
 ORDER BY CAST( payments.amount AS FLOAT)DESC
-
+LIMIT 12
 
 """,conn)
 df_payment
@@ -108,35 +112,24 @@ df_contacts
 
 # CodeGrade step6
 # Replace None with your code
-df_credit = pd.read_sql(""" 
 SELECT 
-        employees.employeeNumber,
-        employees.firstName,
-        employees.lastName,
-        COUNT(customers.customerNumber) AS number_of_customers
-    FROM employees
-    JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
-    GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
-    HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY number_of_customers ASC
-""",conn)
+   employees.employeeNumber,
+   employees.firstName,
+   employees.lastName,
+   COUNT(customers.customerNumber) AS number_of_customers
+FROM employees
+JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
+WHERE customers.customerNumber IN (
+   SELECT customerNumber FROM customers
+   WHERE CAST(creditLimit AS FLOAT) > (SELECT AVG(CAST(creditLimit AS FLOAT)) FROM customers)
+)
+GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
+ORDER BY number_of_customers DESC
+""", conn)
 df_credit
 
-# CodeGrade step6
-# Replace None with your code
-df_credit = pd.read_sql(""" 
-SELECT 
-        employees.employeeNumber,
-        employees.firstName,
-        employees.lastName,
-        COUNT(customers.customerNumber) AS number_of_customers
-    FROM employees
-    JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber
-    GROUP BY employees.employeeNumber, employees.firstName, employees.lastName
-    HAVING AVG(CAST(customers.creditLimit AS FLOAT)) > 90000
-    ORDER BY number_of_customers ASC 
-""",conn)
-df_credit
+
+
 
 # CodeGrade step8
 # Replace None with your code
